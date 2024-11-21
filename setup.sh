@@ -73,11 +73,11 @@ multipass exec "$MULTIPASS_VM_NAME" -- juju config kratos-external-idp-integrato
 multipass exec "$MULTIPASS_VM_NAME" -- juju wait-for application -m iam kratos-external-idp-integrator --timeout="$WAIT_TIMEOUT"
 
 multipass_vm_ip=$(multipass info --format json "$MULTIPASS_VM_NAME" | jq -r '.info."'"$MULTIPASS_VM_NAME"'".ipv4[0]')
-traefik_public_ip=$(multipass exec "$MULTIPASS_VM_NAME" -- /home/ubuntu/helpers/show-traefik-public-url.sh)
+iam_traefik_public_ip=$(multipass exec "$MULTIPASS_VM_NAME" -- /home/ubuntu/helpers/show-iam-traefik-public-url.sh)
 
 echo "Sudo password required to add the following route:"
-echo "sudo ip route add ${traefik_public_ip}/32 via $multipass_vm_ip"
-sudo ip route add "${traefik_public_ip}/32" via "$multipass_vm_ip"
+echo "sudo ip route add ${iam_traefik_public_ip}/32 via $multipass_vm_ip"
+sudo ip route add "${iam_traefik_public_ip}/32" via "$multipass_vm_ip"
 
 multipass exec "$MULTIPASS_VM_NAME" -- juju add-model jimm
 multipass exec "$MULTIPASS_VM_NAME" -- juju deploy -m jimm juju-jimm-k8s --channel=3/edge jimm
@@ -109,13 +109,13 @@ multipass exec "$MULTIPASS_VM_NAME" -- /home/ubuntu/helpers/setup_vault.sh
 multipass exec "$MULTIPASS_VM_NAME" -- juju wait-for application -m jimm vault --timeout="$WAIT_TIMEOUT"
 
 multipass exec "$MULTIPASS_VM_NAME" -- sudo snap install go --classic
-keygen_output=$(multipass exec "$MULTIPASS_VM_NAME" -- go run github.com/go-macaroon-bakery/macaroon-bakery/cmd/bakery-keygen/v3@latest)
-public_key=$(echo "$keygen_output" | jq -r '.public')
-private_key=$(echo "$keygen_output" | jq -r '.private')
+bakery_keygen_output=$(multipass exec "$MULTIPASS_VM_NAME" -- go run github.com/go-macaroon-bakery/macaroon-bakery/cmd/bakery-keygen/v3@latest)
+public_key=$(echo "$bakery_keygen_output" | jq -r '.public')
+private_key=$(echo "$bakery_keygen_output" | jq -r '.private')
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm uuid=$(uuidgen)
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm dns-name="$JIMM_DNS_NAME"
-multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm public-key="${public-key}"
-multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm private-key="${private-key}"
+multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm public-key="${public_key}"
+multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm private-key="${private_key}"
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm juju-dashboard-location="http://${JIMM_DNS_NAME}/auth/whoami"
 
 declare -a apps_to_check=(
@@ -125,3 +125,9 @@ declare -a apps_to_check=(
 for app in "${apps_to_check[@]}"; do
     multipass exec "$MULTIPASS_VM_NAME" -- juju wait-for application -m jimm "$app" --timeout="$WAIT_TIMEOUT"
 done
+
+jimm_ingress_public_ip=$(multipass exec "$MULTIPASS_VM_NAME" -- /home/ubuntu/helpers/show-jimm-ingress-public-url.sh)
+
+echo "Sudo password required to add the following route:"
+echo "sudo ip route add ${jimm_ingress_public_ip}/32 via $multipass_vm_ip"
+sudo ip route add "${jimm_ingress_public_ip}/32" via "$multipass_vm_ip"
