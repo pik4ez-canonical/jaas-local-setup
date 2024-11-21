@@ -50,8 +50,8 @@ kratos_url=$(multipass exec "$MULTIPASS_VM_NAME" -- /home/ubuntu/helpers/show-kr
 echo "Register a Github Application"
 echo ""
 echo "Open https://github.com/settings/applications/new."
-echo "Enter an Application name, for example test-jaas."
-echo "Set Homepage URL, for example https://test-jaas.localhost."
+echo "Set Application name, for example test-jimm-oauth."
+echo "Set Homepage URL to https://${JIMM_DNS_NAME}."
 echo "Set Authorization callback URL to ${kratos_url}/self-service/methods/oidc/callback/github."
 echo "Leave Enable Device Flow unchecked."
 echo ""
@@ -113,10 +113,10 @@ keygen_output=$(multipass exec "$MULTIPASS_VM_NAME" -- go run github.com/go-maca
 public_key=$(echo "$keygen_output" | jq -r '.public')
 private_key=$(echo "$keygen_output" | jq -r '.private')
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm uuid=$(uuidgen)
-# TODO remove hardcoded DNS name.
-multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm dns-name=test-jaas.localhost
+multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm dns-name="$JIMM_DNS_NAME"
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm public-key="${public-key}"
 multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm private-key="${private-key}"
+multipass exec "$MULTIPASS_VM_NAME" -- juju config jimm juju-dashboard-location="http://${JIMM_DNS_NAME}/auth/whoami"
 
 declare -a apps_to_check=(
     "jimm"
