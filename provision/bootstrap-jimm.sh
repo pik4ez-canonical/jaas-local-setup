@@ -59,6 +59,9 @@ juju config jimm public-key="${public_key}"
 juju config jimm private-key="${private_key}"
 juju config jimm juju-dashboard-location="http://${JIMM_DNS_NAME}/auth/whoami"
 
+juju run jimm-cert/0 get-ca-certificate --quiet | yq .ca-certificate | sudo tee /usr/local/share/ca-certificates/jimm-test.crt
+sudo update-ca-certificates
+
 declare -a apps_to_check=(
     "jimm"
     "ingress"
