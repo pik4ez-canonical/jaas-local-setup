@@ -20,3 +20,6 @@ sudo snap alias microk8s.kubectl kubectl
 
 sudo snap install go --classic
 sudo snap install vault
+
+sudo snap install jimmctl --channel=3/stable
+sudo snap install jaas --channel=3/stable
