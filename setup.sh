@@ -25,10 +25,10 @@ echo "Sudo password required to add the following route:"
 echo "sudo ip route add ${iam_traefik_public_ip}/32 via $multipass_vm_ip"
 sudo ip route add "${iam_traefik_public_ip}/32" via "$multipass_vm_ip"
 
-multipass exec "$VM_NAME" -- "${VM_HOME}/provision/bootstrap-jimm.sh" "$VM_HOME" "$JIMM_DNS_NAME" "$WAIT_TIMEOUT"
+multipass exec "$VM_NAME" -- "${VM_HOME}/provision/bootstrap-jimm.sh" "$JIMM_DNS_NAME" "$WAIT_TIMEOUT"
 jimm_ingress_public_ip=$(multipass exec "$VM_NAME" -- "${VM_HOME}/helpers/show-jimm-ingress-public-url.sh")
 echo "Sudo password required to add the following route:"
 echo "sudo ip route add ${jimm_ingress_public_ip}/32 via $multipass_vm_ip"
 sudo ip route add "${jimm_ingress_public_ip}/32" via "$multipass_vm_ip"
 
-multipass exec "$VM_NAME" -- "${VM_HOME}/provision/onboard-controllers.sh" "$JIMM_ADMIN_EMAIL"
+multipass exec "$VM_NAME" -- "${VM_HOME}/provision/onboard-controllers.sh" "$JIMM_ADMIN_EMAIL" "$JIMM_DNS_NAME"

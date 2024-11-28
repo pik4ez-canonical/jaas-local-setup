@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
 VM_HOME="$1"
 VM_LB_IP_RANGE="$2"
 
@@ -22,4 +21,3 @@ sudo snap install go --classic
 sudo snap install vault
 
 sudo snap install jimmctl --channel=3/stable
-sudo snap install jaas --channel=3/stable

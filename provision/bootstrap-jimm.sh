@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-VM_HOME="$1"
-JIMM_DNS_NAME="$2"
-WAIT_TIMEOUT="$3"
+JIMM_DNS_NAME="$1"
+WAIT_TIMEOUT="$2"
 
 juju add-model jimm
 juju deploy juju-jimm-k8s --channel=3/edge jimm

@@ -3,6 +3,7 @@
 set -euo pipefail
 
 JIMM_ADMIN_EMAIL="$1"
+JIMM_DNS_NAME="$2"
 
 CONTROLLER_JIMM="jimm-k8s"
 
@@ -12,7 +13,7 @@ CONTROLLER_STAGING="staging-controller"
 MODEL_DEV_1="dev-model-1"
 MODEL_STAGING_1="staging-model-1"
 
-juju login test-jimm.localhost:443 -c "$CONTROLLER_JIMM"
+juju login "${JIMM_DNS_NAME}:443" -c "$CONTROLLER_JIMM"
 juju switch jimm-demo-controller
 juju config jimm controller-admins="$JIMM_ADMIN_EMAIL"
 
